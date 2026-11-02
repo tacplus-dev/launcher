@@ -1,0 +1,4 @@
+# Build output (tacplus-dev/launcher#4): the launcher is built from source and released,
+# never committed. `go build ./...` writes /launcher.
+/launcher
+/launcher-linux-*

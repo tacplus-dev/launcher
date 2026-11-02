@@ -1,0 +1,6 @@
+# The gate map of tacplus-dev/launcher (looper README: Gates scaled to the diff).
+# One set: every land runs gates.sh (build, vet, tidy, govulncheck of the source
+# and of the static linux binaries, and a clean checkout after the build).
+full:
+  run: ./gates.sh
+  minutes: 5
