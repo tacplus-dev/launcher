@@ -8,6 +8,7 @@ Unreleased (no tags); a plain Go module (go 1.27), no tacplus floor. Copied 2026
 
 ## Next
 - Nothing approved yet.
+-  (#5). Agent, at Jody's request, 2026-11-06.
 
 ## Later
 - Nothing recorded yet.
