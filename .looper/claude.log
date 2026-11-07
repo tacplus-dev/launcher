@@ -1,0 +1,251 @@
+= init
+= thinking_tokens
+= thinking_tokens
+> Bash cd /builds/looper/launcher/issues/5; ls -la; cat gates.sh gates.yaml tacplus.yaml 2>/dev/null; ls .github .github/workflows 2>/dev/null; cat PROPOSALS.md STATE.md ROADMAP.md; gh issue view 5 --repo tacplus-dev/launcher --comments | tail -40
+< total 80 drwxr-x--- 4 looper-5 looper-5  4096 Nov  7 12:02 . drwxr-xr-x 3 root     root      4096 Nov  7 12:02 .. drwxr-xr-x 8 looper-5 looper-5  4096 Nov  7 12:02 .git drwxr-xr-x 3 looper-5 looper-5  4096 Nov  7 12:02 .github -rw-r--r-- 1 looper-5 looper-5   171 Nov  7 12:02 .gitignore -rw-r--r-- 1...
+= thinking_tokens
+= thinking_tokens
+> Bash cd /builds/looper/launcher/issues/5; cat .github/workflows/planning-files.yml README.md go.mod .gitignore; git tag; gh release list --repo tacplus-dev/launcher; gh api repos/tacplus-dev/launcher --jq .permissions; gh api repos/tacplus-dev/launcher/rulesets 2>&1 | head -20; gh api repos/tacplus-dev/l...
+< Exit code 1 # The planning files check (tacplus-dev/roadmap decisions/repo-roadmap-files-2026-10-27.md): # STATE.md, PROPOSALS.md and HISTORY.md exist and HISTORY.md is append-only. See tacplus-dev/looper. name: planning-files on:   push:     branches: [main]   pull_request: {} permissions:   conten...
+= thinking_tokens
+= thinking_tokens
+> Bash /usr/local/bin/repo-looper --help 2>&1 | head -60
+< repo-looper: the looper of one tacplus-dev repository. It runs in the looper container, as jobs of the GitLab looper pipeline, and only while the repository has work: a job per issue, its report, and a manager per repository, which alone merges to its main (looper#70).    repo-looper --repo NAME --i...
+> Bash /usr/local/bin/repo-looper --help 2>&1 | sed -n 60,200p | grep -n -i -B2 -A6 'tag\|release'
+< 74-The planning files (looper#13): as it starts, the manager creates a missing 75-STATE.md, PROPOSALS.md or HISTORY.md on main from its template in 76:tacplus-dev/roadmap (ROADMAP.md never), and a closed issue and each release 77:(a new vX.Y.Z tag) get their line at the end of HISTORY.md, by the man...
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+> Bash cd /builds/looper/launcher/issues/5; go version; git remote -v; for a in actions/checkout actions/setup-go; do gh api repos/$a/releases/latest --jq '.tag_name'; done
+= task_started
+= task_notification
+< go: downloading go1.27.3 (linux/arm64) go version go1.27.3 linux/arm64 origin	https://github.com/tacplus-dev/launcher.git (fetch) origin	https://github.com/tacplus-dev/launcher.git (push) v7.0.1 v7.0.0
+I'm writing a tag-triggered release workflow plus a `release.sh` that the gates reuse. I'm resolving the action SHAs so they can be pinned.
+> Bash for a in actions/checkout:v7.0.1 actions/setup-go:v7.0.0; do r=${a%%:*}; t=${a##*:}; gh api repos/$r/commits/$t --jq .sha; done; gh api repos/tacplus-dev/looper/contents/.github/workflows --jq '.[].name' 2>&1
+< 3d3c42e5aac5ba805825da76410c181273ba90b1 b7ad1dad31e06c5925ef5d2fc7ad053ef454303e image.yml planning-files.yml
+> Bash gh api repos/tacplus-dev/looper/contents/.github/workflows/image.yml -H 'Accept: application/vnd.github.raw' | head -60
+< # Copyright (c) 2026 Jody Scott # SPDX-License-Identifier: Apache-2.0 # # Runs the tests, then builds the looper image on every push to main (main, # main-<sha>) and on a vX.Y.Z tag (X.Y.Z, X.Y, latest), smoke-tests it, and # pushes it to ghcr. arm64: the build hosts (this Mac under colima, the arm6...
+= thinking_tokens
+= thinking_tokens
+> Bash mkdir -p /builds/looper/launcher/issues/5/tests && cat > /builds/looper/launcher/issues/5/tests/release.test.sh <<'EOF' #!/bin/sh # The test of release.sh (tacplus-dev/launcher#5): it writes launcher-linux-amd64, # launcher-linux-arm64 and checksums.txt, nothing else; the binaries are static # linux...
+< /builds/looper/launcher/issues/5/tests/release.test.sh: 11: ./release.sh: not found exit 127
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+> Bash cd /builds/looper/launcher/issues/5; cat > release.sh <<'EOF' #!/bin/sh # The release assets of tacplus-dev/launcher (#5), written to DIR: the static # linux binaries launcher-linux-amd64 and launcher-linux-arm64, built as the # README says, each checked with govulncheck -mode=binary, and checksums....
+< #!/bin/sh # The gates of tacplus-dev/launcher (gates.yaml): build, vet and tidy the module, # check it with govulncheck, build the static linux binaries the Java images # take (CGO_ENABLED=0, amd64 and arm64) and their checksums.txt as a release does # (release.sh, tests/release.test.sh), each binar...
+Gates are running. Meanwhile, the workflow:
+> Write /builds/looper/launcher/issues/5/.github/workflows/release.yml
+< File created successfully at: /builds/looper/launcher/issues/5/.github/workflows/release.yml (file state is current in your context — no need to Read it back)
+> Bash sleep 60; cat /tmp/gates5.log | tail -20
+< <tool_use_error>Blocked: sleep 60 followed by: cat /tmp/gates5.log tail -20. To wait for a condition, use Monitor with an until-loop (e.g. `until <check>; do sleep 2; done`). To wait for a command you started, use run_in_background: true. Do not chain shorter sleeps to work around this block.</tool_...
+= thinking_tokens
+= thinking_tokens
+> Edit /builds/looper/launcher/issues/5/.github/workflows/release.yml
+< The file /builds/looper/launcher/issues/5/.github/workflows/release.yml has been updated successfully. (file state is current in your context — no need to Read it back)
+> Bash until ! kill -0 770 2>/dev/null; do sleep 3; done; tail -15 /tmp/gates5.log
+= task_started
+= task_notification
+< 	dep	golang.org/x/text	v0.43.0	h1:1QivrlhwAsnMOcqgOdl9my7s9OyZl8O5/UGUTJVXoWc= 	dep	google.golang.org/genproto/googleapis/rpc	v0.0.0-20260706201446-f0a921348800	h1:qEHAMpSaUhtD0p3NbEEI83HwNGFxEwaSJ1G9PLnCBZE= 	dep	google.golang.org/grpc	v1.84.0	h1:soMyaPJ8pAak5PIQ0DGBUir0XRo2fRoMqhNWMLlLxO0= 	dep	go...
+= thinking_tokens
+= thinking_tokens
+> Bash grep -n 'release.test\|ldflags\|No vuln' /tmp/gates5.log | head
+< 15:No vulnerabilities found. 16:No vulnerabilities found. 17:No vulnerabilities found. 20:release.test: launcher-linux-amd64: no build -ldflags="-s -w" in: /builds/looper/launcher/homes/looper-5/tmp/tmp.CezS2Lpenw/launcher-linux-amd64: go1.27.3
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+> Bash cd /builds/looper/launcher/issues/5; d=$(mktemp -d); CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o $d/a . ; CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -o $d/b .; go tool nm $d/a 2>&1 | head -2; echo "rc"; go tool nm $d/b | head -2; rm -rf $d
+< reading /builds/looper/launcher/homes/looper-5/tmp/tmp.nQnXCgw76O/a: no symbol section reading /builds/looper/launcher/homes/looper-5/tmp/tmp.nQnXCgw76O/a: no symbols rc   96b724 r $f32.358637bd   96b720 r $f32.3f800000 go tool nm: signal: broken pipe
+> Bash cd /builds/looper/launcher/issues/5; python3 - <<'EOF' p='tests/release.test.sh'; s=open(p).read() s=s.replace('''  for want in "CGO_ENABLED=0" "GOOS=linux" "GOARCH=$arch" "-trimpath=true" '-ldflags="-s -w"'; do     echo "$info" | grep -qF -- "build	$want" || fail "launcher-linux-$arch: no build $wa...
+< 12680
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+> Bash cd /builds/looper/launcher/issues/5; python3 - <<'EOF' p='README.md'; s=open(p).read() old='''```sh for arch in amd64 arm64; do   CGO_ENABLED=0 GOOS=linux GOARCH=$arch go build -trimpath -ldflags="-s -w" -o launcher-linux-$arch . done ``` ''' assert old in s s=s.replace(old, old+''' `release.sh DIR`...
+< diff --git a/README.md b/README.md index a938472..4f3c12f 100644 --- a/README.md +++ b/README.md @@ -17,8 +17,16 @@ for arch in amd64 arm64; do  done  ```   +`release.sh DIR` builds them so, checks each with `govulncheck -mode=binary` and +writes `checksums.txt` (sha256). A `vX.Y.Z` tag on main runs...
+The README is updated and the gates are re-running. Next I'm updating STATE and PROPOSALS, then checking the gate result.
+> Bash cd /builds/looper/launcher/issues/5; python3 - <<'EOF' p='STATE.md'; s=open(p).read() s=s.replace('Last updated: 2026-11-02 by looper (#4).','Last updated: 2026-11-07 by looper (#5).') s=s.replace('- **Version / line:** unreleased (no tags);','- **Version / line:** first release v0.1.0 (#5; 0.x);') ...
+< # State: launcher  Overwritten to stay current (loopers and agents). Last updated: 2026-11-07 by looper (#5).  - **Version / line:** first release v0.1.0 (#5; 0.x); a plain Go module, `go 1.27.0` with `toolchain go1.27.3`; no tacplus floor - **Works:** forks `LAUNCH_CMD`, forwards SIGTERM/SIGINT, pr...
+= thinking_tokens
+= thinking_tokens
+> Bash cd /builds/looper/launcher/issues/5; sed -i 's/- \*\*Known gaps:\*\* no tests;/- **Known gaps:** no tests of `main.go` (only `tests\/release.test.sh`, of the release build);/' STATE.md; command -v actionlint && actionlint; git add -A; git status --short; git commit -q -m "Release assets from a vX.Y....
+< A  .github/workflows/release.yml M  PROPOSALS.md M  README.md M  STATE.md M  gates.sh A  release.sh A  tests/release.test.sh 2fc46c1 Release assets from a vX.Y.Z tag: release.sh and the release workflow To https://github.com/tacplus-dev/launcher.git  ! [remote rejected] 558f2de8d657c7b34b1e4fe0d921e...
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+> Bash gh search issues --owner tacplus-dev "workflows permission" --json repository,number,title,state 2>&1 | head; gh search issues --owner tacplus-dev "workflow file" --state open --json repository,number,title 2>&1 | head
+< [{"number":99,"repository":{"name":"looper","nameWithOwner":"tacplus-dev/looper"},"state":"open","title":"--checkpoint says 'pushed' when GitHub rejected the push (a .github/workflows change without the App's workflows permission)"},{"number":106,"repository":{"name":"looper","nameWithOwner":"tacplu...
+= thinking_tokens
+= thinking_tokens
+> Bash for n in 106 18; do gh issue view $n --repo tacplus-dev/looper --comments | head -80; echo =========; done
+< author:	jodydadescott association:	member edited:	false status:	none -- Hub triage, 2026-11-07: **approved, priority high.** It blocks tacplus#315's workflow half and fleet-seatrials#43's CI image move, both on the deploy path. The fix is as written: add `"workflows":"write"` to the report and manag...
+> Bash for n in 106 18; do gh issue view $n --repo tacplus-dev/looper --json title,body,state,labels --jq '.title,.state,([.labels[].name]|join(",")),.body' | head -50; echo =========; done
+< looper-token mints report and manager tokens without workflows: write, so the App's grant never reaches a push OPEN bug,approved,priority:high **What fails.** The tacplus-looper App holds `workflows: write` on the tacplus-dev installation (Jody, 2026-11-06, tacplus-dev/tacplus#315), but a looper sti...
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+> Bash cd /builds/looper/launcher/issues/5; mkdir -p /builds/looper/launcher/homes/looper-5/keep && cp .github/workflows/release.yml /builds/looper/launcher/homes/looper-5/keep/release.yml; git rm -q --cached .github/workflows/release.yml; rm .github/workflows/release.yml python3 - <<'EOF' p='README.md'; s...
+< D  .github/workflows/release.yml M  PROPOSALS.md M  README.md M  STATE.md  .github/workflows/release.yml | 38 --------------------------------------  PROPOSALS.md                  |  4 ++--  README.md                     |  7 +++----  STATE.md                      | 10 +++++-----  4 files changed, 1...
+> Bash cd /builds/looper/launcher/issues/5; git commit -q --amend -m "release.sh: the v0.1.0 release assets, built and checked in the gates  kernel, eventbus and stratum need a pinned, checksummed launcher release (tacplus-dev/kernel#22) and this repository has none. release.sh builds the static launcher-l...
+= task_started
+= task_notification
+<  PROPOSALS.md          |  3 ++-  README.md             | 11 +++++++++--  STATE.md              | 12 ++++++------  gates.sh              | 10 +++-------  release.sh            | 16 ++++++++++++++++  tests/release.test.sh | 25 +++++++++++++++++++++++++  6 files changed, 61 insertions(+), 16 deletions(...
+> Bash cd /builds/looper/launcher/issues/5; /usr/local/bin/repo-looper --repo launcher --issue 5 --checkpoint "Committed release.sh, tests/release.test.sh, gates, docs (gates ok); release workflow kept out (looper#106: no workflows permission), its text is on the issue. Left: land; after looper#106, add .g...
+< remote:      https://github.com/tacplus-dev/launcher/pull/new/looper/launcher-5         remote:  [2026-11-07T12:05:54Z] checkpoint of #5 (a step) pushed to looper/launcher-5:  8 files changed, 305 insertions(+), 16 deletions(-) 46ed46ade30317d69d42a3b5d166272882125230	refs/heads/looper/launcher-5
+> Bash cd /builds/looper/launcher/issues/5; nohup /usr/local/bin/repo-looper --repo launcher --issue 5 --land > /tmp/land5.log 2>&1 & echo $!
+< 14272
+While the land runs, I'm posting the workflow on the issue so the next run (or Jody) can commit it unchanged once looper#106 is fixed.
+> Bash cd /builds/looper/launcher/issues/5; { cat <<'EOF' **Partial, waiting on tacplus-dev/looper#106.** The release workflow Jody approved (a tag build in CI) cannot be pushed by a looper yet. The checkpoint of this branch was refused:  ``` ! [remote rejected] ... -> looper/launcher-5 (refusing to allow ...
+< https://github.com/tacplus-dev/launcher/issues/5#issuecomment-6706719839
+> Bash until ! kill -0 14272 2>/dev/null; do sleep 10; done; tail -15 /tmp/land5.log
+= task_started
+= background_tasks_changed
+= task_updated
+< Command did not complete within its 600s timeout and was moved to the background (ID: bmrzf6mvj). Output is being written to: /builds/looper/launcher/homes/looper-5/tmp/claude-61000/-builds-looper-launcher-issues-5/58c26b49-9f42-4fac-b3a7-19de2366ac8f/tasks/bmrzf6mvj.output. You will be notified whe...
+> Bash tail -5 /tmp/land5.log
+< [2026-11-07T12:05:58Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  9 files changed, 312 insertions(+), 16 deletions(-) [2026-11-07T12:05:59Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and says on the issue what came of ...
+> Bash until ! kill -0 14272 2>/dev/null; do sleep 15; done; tail -8 /tmp/land5.log
+= background_tasks_changed
+= task_started
+< Command running in background with ID: bapyugyrh. Output is being written to: /builds/looper/launcher/homes/looper-5/tmp/claude-61000/-builds-looper-launcher-issues-5/58c26b49-9f42-4fac-b3a7-19de2366ac8f/tasks/bapyugyrh.output. You will be notified when it completes. To check interim output, use Rea...
+The land is queued with the manager. I'll wait for its verdict before writing the outcome.
+> ToolSearch {"query":"select:Monitor","max_results":1}
+< 
+> Bash until ! kill -0 14272 2>/dev/null; do sleep 15; done; tail -8 /tmp/land5.log
+= task_started
+= task_updated
+= task_notification
+= background_tasks_changed
+= task_updated
+= task_notification
+= background_tasks_changed
+= background_tasks_changed
+= task_updated
+< Command did not complete within its 600s timeout and was moved to the background (ID: bnmb94rvy). Output is being written to: /builds/looper/launcher/homes/looper-5/tmp/claude-61000/-builds-looper-launcher-issues-5/58c26b49-9f42-4fac-b3a7-19de2366ac8f/tasks/bnmb94rvy.output. You will be notified whe...
+> Bash kill -0 14272 && echo running; tail -4 /tmp/land5.log; gh issue view 5 --repo tacplus-dev/launcher --comments | tail -15
+< running [2026-11-07T12:05:58Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  9 files changed, 312 insertions(+), 16 deletions(-) [2026-11-07T12:05:59Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and says on the issue what ...
+> Monitor until ! kill -0 14272 2>/dev/null; do sleep 15; done; echo "land exited"; tail -6 /tmp/land5.log
+= permission_denied
+< This Bash command contains multiple operations. The following parts require approval: kill -0 14272, tail -6 /tmp/land5.log
+> Bash until ! kill -0 14272 2>/dev/null; do sleep 15; done; tail -8 /tmp/land5.log
+= background_tasks_changed
+= task_started
+< Command running in background with ID: bf6d50zza. Output is being written to: /builds/looper/launcher/homes/looper-5/tmp/claude-61000/-builds-looper-launcher-issues-5/58c26b49-9f42-4fac-b3a7-19de2366ac8f/tasks/bf6d50zza.output. You will be notified when it completes. To check interim output, use Rea...
+The land is still queued with the manager. I'll get a notification when its verdict arrives.
+= success: The land is still queued with the manager. I'll get a notification when its verdict arrives.
+= task_updated
+= task_notification
+= background_tasks_changed
+= init
+> Bash kill -0 14272 && echo running; tail -3 /tmp/land5.log
+< running [2026-11-07T12:05:58Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  9 files changed, 312 insertions(+), 16 deletions(-) [2026-11-07T12:05:59Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and says on the issue what ...
+That notification was from an older wait loop. The land itself (PID 14272) is still queued, and the current wait (bf6d50zza) will notify me when the verdict arrives.
+= success: That notification was from an older wait loop. The land itself (PID 14272) is still queued, and the current wait (bf6d50zza) will notify me when the verdict arrives.
+= task_updated
+= task_notification
+= background_tasks_changed
+= init
+> Bash date -u; kill -0 14272 && echo running; tail -5 /tmp/land5.log; gh issue view 5 --repo tacplus-dev/launcher --json comments --jq '.comments[-1] | .author.login + ": " + .body[0:600]'
+< Sat Nov  7 13:26:28 UTC 2026 running [2026-11-07T12:05:58Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  9 files changed, 312 insertions(+), 16 deletions(-) [2026-11-07T12:05:59Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time...
+= thinking_tokens
+= thinking_tokens
+> Bash until ! kill -0 14272 2>/dev/null; do sleep 30; done; tail -8 /tmp/land5.log
+= background_tasks_changed
+= task_started
+< Command running in background with ID: b8qpy6g37. Output is being written to: /builds/looper/launcher/homes/looper-5/tmp/claude-61000/-builds-looper-launcher-issues-5/58c26b49-9f42-4fac-b3a7-19de2366ac8f/tasks/b8qpy6g37.output. You will be notified when it completes. To check interim output, use Rea...
+The land has been queued since 12:05Z with no verdict yet. I've set a wait of up to 90 minutes on it.
+= success: The land has been queued since 12:05Z with no verdict yet. I've set a wait of up to 90 minutes on it.
+= task_updated
+= task_notification
+= background_tasks_changed
+= init
+> Bash date -u; kill -0 14272 && echo running; tail -3 /tmp/land5.log; git -C /builds/looper/launcher/issues/5 ls-remote origin main looper/launcher-5; gh issue view 5 --repo tacplus-dev/launcher --json comments,labels --jq '([.labels[].name]|join(",")), (.comments[-1].author.login + ": " + .comments[-1].b...
+< Sat Nov  7 14:56:35 UTC 2026 running [2026-11-07T12:05:58Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  9 files changed, 312 insertions(+), 16 deletions(-) [2026-11-07T12:05:59Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time...
+= thinking_tokens
+= thinking_tokens
+> Bash end=$(( $(date +%s) + 2400 )); while kill -0 14272 2>/dev/null && [ $(date +%s) -lt $end ]; do sleep 30; done; date -u; tail -6 /tmp/land5.log
+= background_tasks_changed
+= task_started
+< Command running in background with ID: bvy9ts87c. Output is being written to: /builds/looper/launcher/homes/looper-5/tmp/claude-61000/-builds-looper-launcher-issues-5/58c26b49-9f42-4fac-b3a7-19de2366ac8f/tasks/bvy9ts87c.output. You will be notified when it completes. To check interim output, use Rea...
+The land is still queued at 14:56Z, with about 55 minutes of run time left. I'll wait up to 40 more minutes for the verdict. If none comes, I'll write the `Blocked-by: tacplus-dev/looper#106` outcome, and the manager lands the queued branch after the run ends.
+= success: The land is still queued at 14:56Z, with about 55 minutes of run time left. I'll wait up to 40 more minutes for the verdict. If none comes, I'll write the `Blocked-by: tacplus-dev/looper#106` outcome, and the manager lands the queued branch after the run ends.
+= task_updated
+= task_notification
+= background_tasks_changed
+= init
+> Bash cat /builds/looper/launcher/homes/looper-5/tmp/claude-61000/-builds-looper-launcher-issues-5/58c26b49-9f42-4fac-b3a7-19de2366ac8f/tasks/bvy9ts87c.output; kill -0 14272 && echo running
+< Sat Nov  7 15:36:41 UTC 2026 [2026-11-07T12:05:58Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  9 files changed, 312 insertions(+), 16 deletions(-) [2026-11-07T12:05:59Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and sa...
+= thinking_tokens
+= thinking_tokens
+No verdict yet, and about 15 minutes remain. I'll post a status comment, then write the outcome.
+> Bash cd /builds/looper/launcher/issues/5; gh issue comment 5 --repo tacplus-dev/launcher --body "Run ending (time limit): the land of looper/launcher-5 (release.sh, tests/release.test.sh, gates.sh through them, README/STATE/PROPOSALS) has been queued with the manager since 12:05Z with no verdict yet; the...
+< Blocked-by: tacplus-dev/looper#106
+I couldn't publish v0.1.0 in this run. The release workflow can't be pushed until tacplus-dev/looper#106 is fixed, so I've marked the issue blocked on it rather than closing it. That issue is already open, approved and high priority.
+
+**What blocks it:** pushing branch `looper/launcher-5` with `.github/workflows/release.yml` was refused: the looper's tokens don't have `workflows: write`. Looper#106 is exactly that problem. Until it's fixed, nothing that includes the workflow can be pushed, so there's no tag build and no v0.1.0 release yet.
+
+**What is queued to land:** the land has been waiting in the manager's queue since 12:05Z with no verdict. The manager lands it after this run ends. It contains:
+- `release.sh DIR` builds `launcher-linux-amd64` and `launcher-linux-arm64` with the README's command. It checks each with `govulncheck -mode=binary` and writes `checksums.txt` (sha256).
+- `tests/release.test.sh` checks the output:
+  - there are exactly three files and `checksums.txt` verifies;
+  - the build info shows `CGO_ENABLED=0`, `GOOS=linux`, the right arch and `-trimpath`;
+  - the binaries are stripped.
+- `gates.sh` now builds the binaries through that test instead of its own loop.
+- README, STATE.md and PROPOSALS.md say the release is still waiting on looper#106.
+
+`./gates.sh` passed locally: `release.test: ok`, `gates: ok`. I couldn't see which gates the land runs because its verdict hasn't arrived. No service handlers were touched, so the trace check didn't apply.
+
+**For the next run:** the workflow text (a build on `v*.*.*` tags, actions pinned by SHA, the tag required to be on main) is posted in full on the issue. Once looper#106 is fixed:
+1. Commit it as `.github/workflows/release.yml` and land it.
+2. Tag v0.1.0 on main.
+3. Check the three files download from the release URL.
+
+I also posted a comment on the issue saying the run ended with the land still queued. The outcome file says `Blocked-by: tacplus-dev/looper#106`.
+= success: I couldn't publish v0.1.0 in this run. The release workflow can't be pushed until tacplus-dev/looper#106 is fixed, so I've marked the issue blocked on it rather than closing it. That issue is already open, approved and high priority.
+
+**What blocks it:** pushing branch `looper/launcher-5` with `.github/workflows/release.yml` was refused: the looper's tokens don't have `workflows: write`. Looper#106 is exactly that problem. Until it's fixed, nothing that includes the workflow can be pushed, so there's no tag build and no v0.1.0 release yet.
+
+**What is queued to land:** the land has been waiting in the manager's queue since 12:05Z with no verdict. The manager lands it after this run ends. It contains:
+- `release.sh DIR` builds `launcher-linux-amd64` and `launcher-linux-arm64` with the README's command. It checks each with `govulncheck -mode=binary` and writes `checksums.txt` (sha256).
+- `tests/release.test.sh` checks the output:
+  - there are exactly three files and `checksums.txt` verifies;
+  - the build info shows `CGO_ENABLED=0`, `GOOS=linux`, the right arch and `-trimpath`;
+  - the binaries are stripped.
+- `gates.sh` now builds the binaries through that test instead of its own loop.
+- README, STATE.md and PROPOSALS.md say the release is still waiting on looper#106.
+
+`./gates.sh` passed locally: `release.test: ok`, `gates: ok`. I couldn't see which gates the land runs because its verdict hasn't arrived. No service handlers were touched, so the trace check didn't apply.
+
+**For the next run:** the workflow text (a build on `v*.*.*` tags, actions pinned by SHA, the tag required to be on main) is posted in full on the issue. Once looper#106 is fixed:
+1. Commit it as `.github/workflows/release.yml` and land it.
+2. Tag v0.1.0 on main.
+3. Check the three files download from the release URL.
+
+I also posted a comment on the issue saying the run ended with the land still queued. The outcome file says `Blocked-by: tacplus-dev/looper#106`.
