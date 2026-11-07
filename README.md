@@ -17,8 +17,15 @@ for arch in amd64 arm64; do
 done
 ```
 
+`release.sh DIR` builds them so, checks each with `govulncheck -mode=binary` and
+writes `checksums.txt` (sha256), the assets of a `vX.Y.Z` GitHub release:
+`https://github.com/tacplus-dev/launcher/releases/download/vX.Y.Z/<asset>`.
+Pin a version and its sha256 from `checksums.txt`. (The tag workflow that runs it
+and attaches them is tacplus-dev/launcher#5, waiting on tacplus-dev/looper#106.)
+
 ## Gates
 
 `./gates.sh` (`gates.yaml`): `go build`, `go vet`, `go mod tidy -diff`,
-`govulncheck` of the source and of both static linux binaries, and a checkout
-the build leaves clean.
+`govulncheck` of the source, the release assets built and checked
+(`tests/release.test.sh`: static, stripped, `-trimpath`, `checksums.txt` verifies,
+`govulncheck` of both binaries), and a checkout the build leaves clean.
