@@ -29,3 +29,6 @@ and attaches them is tacplus-dev/launcher#5, waiting on tacplus-dev/looper#106.)
 `govulncheck` of the source, the release assets built and checked
 (`tests/release.test.sh`: static, stripped, `-trimpath`, `checksums.txt` verifies,
 `govulncheck` of both binaries), and a checkout the build leaves clean.
+They run, with no Docker, in the image `build.lock` pins by digest (tacplus build 2.6.1, the fleet's build
+image), from which tacplus-dev/build plans every build of a commit (looper#71); to move it, change its digest:
+a new digest is a change like any other, landed on the full gates.
