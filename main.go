@@ -13,11 +13,14 @@
 //
 // Environment variables:
 //
-//	LAUNCH_CMD       Command to run, whitespace-split (required)
-//	HEALTH_PORT      gRPC port to poll for health (default: 5000; set to "0" to disable)
-//	HEALTH_INTERVAL  How often to poll, e.g. "30s" (default: 30s)
-//	HEALTH_TIMEOUT   Kill child after this long unhealthy, e.g. "5m" (default: 5m)
-//	HEALTH_SERVICE   gRPC service name to check (default: "")
+//	LAUNCH_CMD          Command to run, whitespace-split (required)
+//	HEALTH_PORT         gRPC port to poll for health (default: 5000; set to "0" to disable)
+//	HEALTH_CA           PEM file of the CA(s) that issue the child's certificate: the
+//	                    probe then speaks TLS and verifies it (default: unset, plaintext)
+//	HEALTH_SERVER_NAME  Name the child's certificate must carry (default: "localhost")
+//	HEALTH_INTERVAL     How often to poll, e.g. "30s" (default: 30s)
+//	HEALTH_TIMEOUT      Kill child after this long unhealthy, e.g. "5m" (default: 5m)
+//	HEALTH_SERVICE      gRPC service name to check (default: "")
 //
 // Usage in a Dockerfile:
 //
@@ -31,6 +34,8 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -45,11 +50,13 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 const (
 	defaultHealthPort     = "5000"
+	defaultHealthServer   = "localhost"
 	defaultHealthInterval = 30 * time.Second
 	defaultHealthTimeout  = 5 * time.Minute
 )
@@ -122,7 +129,7 @@ func healthMonitor(child *exec.Cmd, port string) {
 	}
 
 	target := "127.0.0.1:" + port
-	conn, err := grpc.NewClient(target, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: true, ServerName: "localhost", MinVersion: tls.VersionTLS13}))) //nolint:gosec
+	conn, err := newHealthConn(target)
 	if err != nil {
 		log.Printf("health: failed to create client for %s: %v — monitoring disabled", target, err)
 		return
@@ -135,7 +142,11 @@ func healthMonitor(child *exec.Cmd, port string) {
 	// zero means currently healthy.
 	var firstFailure atomic.Int64
 
-	log.Printf("health: monitoring %s every %s (timeout %s)", target, interval, timeout)
+	mode := "plaintext"
+	if strings.TrimSpace(os.Getenv("HEALTH_CA")) != "" {
+		mode = "TLS, verified against HEALTH_CA"
+	}
+	log.Printf("health: monitoring %s (%s) every %s (timeout %s)", target, mode, interval, timeout)
 
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
@@ -179,6 +190,43 @@ func healthMonitor(child *exec.Cmd, port string) {
 			log.Printf("health: %s status=%s (%s elapsed)", target, resp.GetStatus(), elapsed)
 		}
 	}
+}
+
+// newHealthConn returns the client connection of the health probe to target,
+// with the credentials of healthCredentials.
+func newHealthConn(target string) (*grpc.ClientConn, error) {
+	creds, err := healthCredentials()
+	if err != nil {
+		return nil, err
+	}
+	return grpc.NewClient(target, grpc.WithTransportCredentials(creds))
+}
+
+// healthCredentials returns the health probe's transport credentials. With
+// HEALTH_CA set, the probe speaks TLS and verifies the child's certificate
+// against the CA certificates in that PEM file, for the name
+// HEALTH_SERVER_NAME (default "localhost"); it never skips verification
+// (launcher#7). Without it, the probe is plaintext over loopback, for a child
+// that serves a plaintext health port (the tacplus chassis's
+// health_probe_port, 8444 by default).
+func healthCredentials() (credentials.TransportCredentials, error) {
+	caFile := strings.TrimSpace(os.Getenv("HEALTH_CA"))
+	if caFile == "" {
+		return insecure.NewCredentials(), nil
+	}
+	pemBytes, err := os.ReadFile(caFile)
+	if err != nil {
+		return nil, fmt.Errorf("HEALTH_CA: %w", err)
+	}
+	pool := x509.NewCertPool()
+	if !pool.AppendCertsFromPEM(pemBytes) {
+		return nil, errors.New("HEALTH_CA: no PEM certificate in " + caFile)
+	}
+	serverName := strings.TrimSpace(os.Getenv("HEALTH_SERVER_NAME"))
+	if serverName == "" {
+		serverName = defaultHealthServer
+	}
+	return credentials.NewTLS(&tls.Config{RootCAs: pool, ServerName: serverName, MinVersion: tls.VersionTLS13}), nil
 }
 
 // findBinary resolves the binary path, searching PATH when not absolute.
