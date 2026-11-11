@@ -1,0 +1,254 @@
+= init
+> Bash gh issue view 5 --repo tacplus-dev/launcher --comments | tail -30; git status; git log --oneline -3; git diff --stat; cat .github/workflows/release.yml
+< This issue stays approved, and looper:landing until that verdict: then the next run finishes it. Run record: job https://gitlab.com/tacplus-dev/looper/-/jobs/17852261195, artifact `looper-runs/20261109T125523Z-issue-5/claude.log` (https://gitlab.com/tacplus-dev/looper/-/jobs/17852261195/artifacts/br...
+= thinking_tokens
+= thinking_tokens
+> Bash git diff; cat gates.yaml 2>/dev/null; cat build.lock 2>/dev/null; gh release list --repo tacplus-dev/launcher; git ls-remote --tags origin
+< diff --git a/PROPOSALS.md b/PROPOSALS.md index 34bbb4a..3ccb430 100644 --- a/PROPOSALS.md +++ b/PROPOSALS.md @@ -9,4 +9,4 @@ the looper then marks it `promoted` or `declined` here with the date.  - **Release assets from the deterministic build** (2026-11-07, tacplus-dev/launcher#5, tacplus-dev/loope...
+= thinking_tokens
+= thinking_tokens
+> Bash sed -i 's/Last updated: 2026-11-09 by looper (#5)/Last updated: 2026-11-11 by looper (#5)/' STATE.md && ./gates.sh 2>&1 | tail -5
+= task_started
+= task_notification
+< No vulnerabilities found. launcher-linux-amd64: OK launcher-linux-arm64: OK release.test: ok gates: ok
+> Bash git status --short && git add -A && git commit -q -F - <<'EOF' release.yml: build and attach the v0.1.0 assets on a vX.Y.Z tag  Jody approved a tag build in CI (#5): on a vX.Y.Z tag on main, the workflow builds launcher-linux-{amd64,arm64} with release.sh (static, -trimpath, govulncheck -mode=binary...
+<  M PROPOSALS.md  M README.md  M STATE.md ?? .github/workflows/release.yml 2618027 release.yml: build and attach the v0.1.0 assets on a vX.Y.Z tag [2026-11-11T01:19:04Z] checkpoint of #5 (a step) pushed to looper/launcher-5:  6 files changed, 316 insertions(+), 7 deletions(-)
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+> Bash cd /tmp && nohup /usr/local/bin/repo-looper --repo launcher --issue 5 --build > /tmp/build5.log 2>&1 & echo $!; which glab; sleep 1
+< 12794 /usr/local/bin/glab
+I committed the release workflow (2618027), local gates pass, and the build job is now running. Meanwhile I'm checking why the last two build pipelines never reported a verdict.
+> Bash glab api projects/tacplus-dev%2Fbuild/pipelines/3046969883/jobs 2>&1 | head -c 2000; echo; cat /tmp/build5.log
+< {"message":"404 Project Not Found"}glab: 404 Project Not Found (HTTP 404)  [2026-11-11T01:19:11Z] checkpoint of #5 (a build) pushed to looper/launcher-5:  6 files changed, 321 insertions(+), 7 deletions(-) [2026-11-11T01:19:11Z] build requested: launcher 2618027, the gates full (.github/workflows/re...
+= thinking_tokens
+= thinking_tokens
+> ToolSearch {"query":"select:Monitor","max_results":1}
+< 
+> Bash until ! kill -0 12794 2>/dev/null || [ $(wc -l < /tmp/build5.log) -gt 2 ]; do sleep 20; done; cat /tmp/build5.log
+= background_tasks_changed
+= task_started
+< Command running in background with ID: bdp7sdbvn. Output is being written to: /builds/looper/launcher/homes/looper-5/tmp/claude-61000/-builds-looper-launcher-issues-5/d8d76131-5381-43f8-8cf0-7152faab9338/tasks/bdp7sdbvn.output. You will be notified when it completes. To check interim output, use Rea...
+= task_updated
+= task_notification
+= background_tasks_changed
+Waiting on the build job's next output line (or its exit).
+> Monitor tail -n0 -f /tmp/build5.log
+= permission_denied
+< tail in '/tmp/build5.log' was blocked. For security, Claude Code may only read the end of files from the allowed working directories for this session: '/builds/looper/launcher/issues/5'.
+> Read /builds/looper/launcher/homes/looper-5/tmp/claude-61000/-builds-looper-launcher-issues-5/d8d76131-5381-43f8-8cf0-7152faab9338/tasks/bdp7sdbvn.output
+< 1	[2026-11-11T01:19:11Z] checkpoint of #5 (a build) pushed to looper/launcher-5:  6 files changed, 321 insertions(+), 7 deletions(-) 2	[2026-11-11T01:19:11Z] build requested: launcher 2618027, the gates full (.github/workflows/release.yml matches no gate set) 3	the build job https://gitlab.com/tacpl...
+> Bash while kill -0 12794 2>/dev/null; do sleep 30; done; cat /tmp/build5.log
+= background_tasks_changed
+= task_started
+< Command running in background with ID: bo0vy4u0o. Output is being written to: /builds/looper/launcher/homes/looper-5/tmp/claude-61000/-builds-looper-launcher-issues-5/d8d76131-5381-43f8-8cf0-7152faab9338/tasks/bo0vy4u0o.output. You will be notified when it completes. To check interim output, use Rea...
+= thinking_tokens
+= thinking_tokens
+The build job is running (pipeline 3052401632). I'll wait for its verdict.
+> Bash until [ -s /builds/looper/launcher/homes/looper-5/tmp/claude-61000/-builds-looper-launcher-issues-5/d8d76131-5381-43f8-8cf0-7152faab9338/tasks/bo0vy4u0o.output ]; do sleep 30; done; cat /builds/looper/launcher/homes/looper-5/tmp/claude-61000/-builds-looper-launcher-issues-5/d8d76131-5381-43f8-8cf0-7...
+= task_started
+= background_tasks_changed
+= task_updated
+< Command did not complete within its 600s timeout and was moved to the background (ID: bvag4cpee). Output is being written to: /builds/looper/launcher/homes/looper-5/tmp/claude-61000/-builds-looper-launcher-issues-5/d8d76131-5381-43f8-8cf0-7152faab9338/tasks/bvag4cpee.output. You will be notified whe...
+= thinking_tokens
+= thinking_tokens
+> Bash for i in $(seq 1 19); do kill -0 12794 2>/dev/null || break; sleep 30; done; date -u; cat /tmp/build5.log | tail -5
+= task_started
+= task_notification
+< Wed Nov 11 01:39:02 UTC 2026 [2026-11-11T01:19:11Z] checkpoint of #5 (a build) pushed to looper/launcher-5:  6 files changed, 321 insertions(+), 7 deletions(-) [2026-11-11T01:19:11Z] build requested: launcher 2618027, the gates full (.github/workflows/release.yml matches no gate set) the build job h...
+= thinking_tokens
+= thinking_tokens
+> Bash curl -s https://gitlab.com/api/v4/projects/tacplus-dev%2Fbuild/pipelines/3052401632 | head -c 500; echo; glab auth status 2>&1 | head
+< {"message":"404 Project Not Found"} gitlab.com   x gitlab.com: API call failed: GET https://gitlab.com/api/v4/user: 401 {message: 401 Unauthorized}   ✓ Git operations for gitlab.com configured to use ssh protocol.   ✓ API calls for gitlab.com are made over https protocol.   ✓ REST API Endpoint: http...
+= thinking_tokens
+= thinking_tokens
+> Bash gh search issues --owner tacplus-dev "no verdict" --state open --json repository,number,title,updatedAt 2>&1 | head -c 3000
+< [{"number":113,"repository":{"name":"looper","nameWithOwner":"tacplus-dev/looper"},"title":"Triggered tacplus-dev/build pipelines never report: no commit status, not even pending, and --build waits 3h for nothing (website 325305c, launcher 88cfeae)","updatedAt":"2026-11-11T01:34:56Z"},{"number":26,"...
+> Bash gh issue view 113 --repo tacplus-dev/looper --comments | head -120
+< author:	jodydadescott association:	member edited:	false status:	none -- Hub triage, 2026-11-09: approved, priority high. Build jobs are #84's gate path, and a build that never reports blocks every pinned repo's land. Have the build pipeline post its commit status (pending at start, then the result) ...
+> Bash gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.context) \(.target_url)"'; gh issue view 113 --repo tacplus-dev/looper --comments | tail -40 | head -40
+< author:	tacplus-looper association:	none edited:	false status:	none -- The looper of looper starts this issue with its limit 4h capped at 4h by this job (https://gitlab.com/tacplus-dev/looper/-/jobs/17892430227), which ends sooner: the run stops by itself before then, its work checkpointed, and the ...
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+> Bash kill 12794; cd /builds/looper/launcher/issues/5 && /usr/local/bin/repo-looper --repo launcher --issue 5 --checkpoint "release.yml (2618027) committed, local gates ok; build 3052401632 not taken by any runner (looper#113); landing it. Left: land verdict, tag v0.1.0 on main, verify 3 assets, STATE Rel...
+= task_updated
+= task_notification
+= background_tasks_changed
+< [2026-11-11T01:39:28Z] checkpoint of #5 (a step) pushed to looper/launcher-5:  6 files changed, 398 insertions(+), 7 deletions(-) /bin/bash: line 1: /builds/looper/launcher/issues/5/../land5.log: Permission denied 16329
+Writing the land log to the parent directory was denied, so the land didn't start. I'm starting it again with the log in /tmp.
+> Bash nohup /usr/local/bin/repo-looper --repo launcher --issue 5 --land > /tmp/land5.log 2>&1 & echo $!; sleep 1
+< 16354
+> Bash for i in $(seq 1 6); do sleep 10; done; cat /tmp/land5.log; kill -0 16354 && echo running
+= task_started
+= task_updated
+= task_notification
+= background_tasks_changed
+= task_notification
+< [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and says on the issue what came of i...
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+The land is queued with the manager. I'll poll for its verdict in bounded 10-minute checks. If a runner takes the gates, I can tag v0.1.0 in this run.
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -3 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/looper/launcher-5/statuses --jq '.[] | "\(.state) \(.created_at) \(.context)"' 2>&1 | head -3
+= task_started
+= task_notification
+< Wed Nov 11 01:50:10 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -3 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.context)"' | head -3; gh issue view 5 --repo tacplus-dev/launcher --json comments --jq '.c...
+= task_started
+= task_notification
+< Wed Nov 11 01:59:44 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+A runner has picked up my earlier build pipeline: commit 2618027 got a `pending` build status at 01:53Z, so builds are moving again. I'll keep polling.
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -3 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.context) \(.description)"' | head -3
+= task_started
+= task_notification
+< Wed Nov 11 02:09:19 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -3 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -3
+= task_started
+= task_notification
+< Wed Nov 11 02:18:52 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+= thinking_tokens
+= thinking_tokens
+The build has shown "building: gates full" for 25 minutes, though the gates take about 5. The gates job itself probably hasn't been given a runner slot yet. Still polling.
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -3 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -3
+= task_started
+= task_notification
+< Wed Nov 11 02:28:27 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -3 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -3
+= task_started
+= task_notification
+< Wed Nov 11 02:38:00 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+= thinking_tokens
+= thinking_tokens
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -2 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -2
+= task_started
+= task_notification
+< Wed Nov 11 02:47:34 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -2 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -2
+= task_started
+= task_notification
+< Wed Nov 11 02:57:07 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+= thinking_tokens
+= thinking_tokens
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -2 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -2
+= task_started
+= task_notification
+< Wed Nov 11 03:06:41 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -2 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -2
+= task_started
+= task_notification
+< Wed Nov 11 03:16:14 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+= thinking_tokens
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -2 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -2
+= task_started
+= task_notification
+< Wed Nov 11 03:25:48 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -2 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -2
+= task_started
+= task_notification
+< Wed Nov 11 03:35:22 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -2 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -2
+= task_started
+= task_notification
+< Wed Nov 11 03:44:55 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; tail -2 /tmp/land5.log; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -2
+= task_started
+= task_notification
+< Wed Nov 11 03:54:28 UTC 2026 jq: error (at <stdin>:5): object ({"message":...) and string ("<!-- loope...) cannot have their containment checked jq: error (at <stdin>:5): object ({"message":...) and string ("<!-- loope...) cannot have their containment checked gh: API rate limit exceeded for install...
+The shared GitHub App token hit its API rate limit, and the land command's own polling is failing on it. I'll check when the limit resets.
+> Bash gh api rate_limit --jq '.resources.core | "\(.remaining) reset \(.reset|todate)"'; kill -0 16354 && echo land-running; tail -c 400 /tmp/land5.log
+< 0 reset 2026-11-11T03:58:13Z land-running !-- loope...) cannot have their containment checked jq: error (at <stdin>:5): object ({"message":...) and string ("<!-- loope...) cannot have their containment checked jq: error (at <stdin>:5): object ({"message":...) and string ("<!-- loope...) cannot have ...
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; grep -v '^jq: error' /tmp/land5.log | tail -3; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -2
+= task_started
+= task_notification
+< Wed Nov 11 04:04:05 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+= thinking_tokens
+= thinking_tokens
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; grep -v '^jq: error' /tmp/land5.log | tail -2; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -2; gh issue view 113 --repo tacplus-dev/loop...
+= task_started
+= task_notification
+< Wed Nov 11 04:13:40 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; grep -v '^jq: error' /tmp/land5.log | tail -2; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -2
+= task_started
+= task_notification
+< Wed Nov 11 04:23:14 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+> Bash for i in $(seq 1 19); do kill -0 16354 2>/dev/null || break; sleep 30; done; date -u; grep -v '^jq: error' /tmp/land5.log | tail -2; gh api repos/tacplus-dev/launcher/commits/2618027/statuses --jq '.[] | "\(.state) \(.created_at) \(.description)"' | head -2
+= task_started
+= task_notification
+< Wed Nov 11 04:32:47 UTC 2026 [2026-11-11T01:39:33Z] checkpoint of #5 (land queued) pushed to looper/launcher-5:  7 files changed, 408 insertions(+), 7 deletions(-) [2026-11-11T01:39:35Z] queued: the manager of launcher merges looper/launcher-5 after the lands queued before it, one at a time, and say...
+Still no verdict at 04:33Z, and my run stops at about 05:07Z. I'm handing off now: checkpoint, comment on the issue, and record that it is blocked by looper#113.
+> Bash /usr/local/bin/repo-looper --repo launcher --issue 5 --checkpoint "release.yml (2618027) queued to land since 01:39Z, local gates ok; build 3052401632's gates job pending since 01:53Z (no runner slot, looper#113). Left: land verdict (land again if red from starvation), tag v0.1.0 on main, verify 3 a...
+< [2026-11-11T04:33:00Z] checkpoint of #5 (a step) pushed to looper/launcher-5:  7 files changed, 519 insertions(+), 7 deletions(-) https://github.com/tacplus-dev/launcher/issues/5#issuecomment-6787093284 Blocked-by: tacplus-dev/looper#113
+= thinking_tokens
+= thinking_tokens
+> Bash kill 16354; echo done
+< done
+The release workflow is committed and queued to land, but `v0.1.0` isn't tagged or released yet. The build system had no free machine to run the checks on, so the land has no verdict.
+
+**What's done**
+- **Commit:** 2618027 on `looper/launcher-5`, on top of main c54ae30, adds `.github/workflows/release.yml`. On a `vX.Y.Z` tag on main, it builds the two static binaries with `release.sh` and attaches them and `checksums.txt` to the GitHub release. README, STATE.md and PROPOSALS.md are updated to match. It's the same change as fb81951, whose last land failed only because its build never reported.
+- **Local gates:** `./gates.sh` passes: `launcher-linux-amd64: OK`, `launcher-linux-arm64: OK`, `release.test: ok`, `gates: ok`.
+- **Land:** queued with the manager since 01:39Z. The manager merges it after this run if the build passes.
+
+**Why it's stuck**
+- The build job (pipeline 3052401632) started at 01:53Z but never got further than "building: gates full", still unchanged at 04:33Z. The gates take about 5 minutes, so the job that runs them never got a machine.
+- This is the build-machine shortage tracked in tacplus-dev/looper#113, which is still open. If the manager's build hits the same wall, the land comes back red after its 3-hour wait and the next run has to land it again.
+- Around 03:54Z the shared GitHub API quota ran out for a few minutes. It didn't change anything, but the polling was briefly blind.
+
+**Still to do**, once the workflow is on main:
+1. Tag `v0.1.0` on main, which runs the workflow.
+2. Check that the three files download from `https://github.com/tacplus-dev/launcher/releases/download/v0.1.0/<asset>`, that `sha256sum -c checksums.txt` passes, and that the binaries are static.
+3. Set STATE.md's "Released" line and close the issue.
+
+I posted this on the issue, saved a checkpoint, and wrote `Blocked-by: tacplus-dev/looper#113` as the outcome. The issue is worked again once looper#113 is closed. No service code was touched, so the trace propagation rule doesn't apply.
+= success: The release workflow is committed and queued to land, but `v0.1.0` isn't tagged or released yet. The build system had no free machine to run the checks on, so the land has no verdict.
+
+**What's done**
+- **Commit:** 2618027 on `looper/launcher-5`, on top of main c54ae30, adds `.github/workflows/release.yml`. On a `vX.Y.Z` tag on main, it builds the two static binaries with `release.sh` and attaches them and `checksums.txt` to the GitHub release. README, STATE.md and PROPOSALS.md are updated to match. It's the same change as fb81951, whose last land failed only because its build never reported.
+- **Local gates:** `./gates.sh` passes: `launcher-linux-amd64: OK`, `launcher-linux-arm64: OK`, `release.test: ok`, `gates: ok`.
+- **Land:** queued with the manager since 01:39Z. The manager merges it after this run if the build passes.
+
+**Why it's stuck**
+- The build job (pipeline 3052401632) started at 01:53Z but never got further than "building: gates full", still unchanged at 04:33Z. The gates take about 5 minutes, so the job that runs them never got a machine.
+- This is the build-machine shortage tracked in tacplus-dev/looper#113, which is still open. If the manager's build hits the same wall, the land comes back red after its 3-hour wait and the next run has to land it again.
+- Around 03:54Z the shared GitHub API quota ran out for a few minutes. It didn't change anything, but the polling was briefly blind.
+
+**Still to do**, once the workflow is on main:
+1. Tag `v0.1.0` on main, which runs the workflow.
+2. Check that the three files download from `https://github.com/tacplus-dev/launcher/releases/download/v0.1.0/<asset>`, that `sha256sum -c checksums.txt` passes, and that the binaries are static.
+3. Set STATE.md's "Released" line and close the issue.
+
+I posted this on the issue, saved a checkpoint, and wrote `Blocked-by: tacplus-dev/looper#113` as the outcome. The issue is worked again once looper#113 is closed. No service code was touched, so the trace propagation rule doesn't apply.
