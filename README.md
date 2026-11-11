@@ -20,8 +20,9 @@ done
 `release.sh DIR` builds them so, checks each with `govulncheck -mode=binary` and
 writes `checksums.txt` (sha256), the assets of a `vX.Y.Z` GitHub release:
 `https://github.com/tacplus-dev/launcher/releases/download/vX.Y.Z/<asset>`.
-Pin a version and its sha256 from `checksums.txt`. (The tag workflow that runs it
-and attaches them is tacplus-dev/launcher#5, waiting on tacplus-dev/looper#106.)
+Pin a version and its sha256 from `checksums.txt`. A `vX.Y.Z` tag on main runs
+`.github/workflows/release.yml`, which builds them with `release.sh` and attaches
+them to the tag's release.
 
 ## Gates
 
