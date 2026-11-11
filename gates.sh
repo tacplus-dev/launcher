@@ -1,5 +1,5 @@
 #!/bin/sh
-# The gates of tacplus-dev/launcher (gates.yaml): build, vet and tidy the module,
+# The gates of tacplus-dev/launcher (gates.yaml): build, vet, tidy and test the module,
 # check it with govulncheck, build the static linux binaries the Java images
 # take (CGO_ENABLED=0, amd64 and arm64) and their checksums.txt as a release does
 # (release.sh, tests/release.test.sh), each binary checked with govulncheck too, and
@@ -11,6 +11,7 @@ before=$(git status --porcelain)
 go build ./...
 go vet ./...
 go mod tidy -diff
+go test ./...
 $govulncheck ./...
 tests/release.test.sh
 after=$(git status --porcelain)

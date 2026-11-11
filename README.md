@@ -23,9 +23,29 @@ writes `checksums.txt` (sha256), the assets of a `vX.Y.Z` GitHub release:
 Pin a version and its sha256 from `checksums.txt`. (The tag workflow that runs it
 and attaches them is tacplus-dev/launcher#5, waiting on tacplus-dev/looper#106.)
 
+## Health probe
+
+With `HEALTH_PORT` set (default 5000; `0` disables it), the launcher calls
+`grpc.health.v1.Health/Check` on `127.0.0.1:$HEALTH_PORT` every `HEALTH_INTERVAL`
+(default 30s) and kills the child once it has not been `SERVING` for
+`HEALTH_TIMEOUT` (default 5m). The probe never skips certificate verification
+(tacplus-dev/launcher#7):
+
+- **plaintext** (default): point `HEALTH_PORT` at the child's plaintext health
+  port, the tacplus chassis's `health_probe_port` (8444 by default), which serves
+  only `grpc.health.v1`.
+- **TLS, verified**: set `HEALTH_CA` to a PEM file of the CA certificates that
+  issue the child's server certificate (the service's `trusted_cas`), and
+  `HEALTH_SERVER_NAME` to a DNS name that certificate carries (default
+  `localhost`).
+
+An image that points `HEALTH_PORT` at its TLS port (8443) without `HEALTH_CA`
+fails every probe and is killed after `HEALTH_TIMEOUT`: before this change the
+probe accepted any certificate there.
+
 ## Gates
 
-`./gates.sh` (`gates.yaml`): `go build`, `go vet`, `go mod tidy -diff`,
+`./gates.sh` (`gates.yaml`): `go build`, `go vet`, `go mod tidy -diff`, `go test`,
 `govulncheck` of the source, the release assets built and checked
 (`tests/release.test.sh`: static, stripped, `-trimpath`, `checksums.txt` verifies,
 `govulncheck` of both binaries), and a checkout the build leaves clean.
