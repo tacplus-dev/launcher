@@ -21,7 +21,7 @@ done
 writes `checksums.txt` (sha256), the assets of a `vX.Y.Z` GitHub release:
 `https://github.com/tacplus-dev/launcher/releases/download/vX.Y.Z/<asset>`.
 Pin a version and its sha256 from `checksums.txt`. (The tag workflow that runs it
-and attaches them is tacplus-dev/launcher#5, waiting on tacplus-dev/looper#106.)
+and attaches them is tacplus-dev/launcher#5: committed, its land waiting on tacplus-dev/looper#113.)
 
 ## Gates
 
