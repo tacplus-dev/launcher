@@ -8,3 +8,4 @@ Append-only: add entries at the end, never edit or remove one (CI enforces it). 
 - 2026-11-15 looper issue gates fail on main: govulncheck finds GO-2026-6859 (net/http) in go.mod's toolchain go1.27.3, fixed in go1.27.4 (#8, ebc2151; gates: full)
 - 2026-11-15 looper issue Build security floor: three HIGH gosec findings in main.go (G402, G702, G703) need a fix or an exception (#7)
 - 2026-11-15 looper release v0.1.0 (https://github.com/tacplus-dev/launcher/releases/tag/v0.1.0)
+- 2026-11-15 looper issue Pin the build: a committed build.lock naming this repository's build image by digest (#6)
