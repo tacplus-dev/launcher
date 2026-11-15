@@ -1,0 +1,38 @@
+# The release of tacplus-dev/launcher (#5): on a vX.Y.Z tag, build the static
+# launcher-linux-amd64 and launcher-linux-arm64 and their checksums.txt with
+# release.sh (govulncheck -mode=binary on each) and attach them to the tag's
+# GitHub release, so kernel, eventbus and stratum pin a version and its sha256
+# (tacplus-dev/kernel#22). The tag must be on main. Built outside the checkout,
+# so the binaries' build info says vcs.modified=false. -trimpath: the binaries are
+# reproducible from the tagged commit with the go.mod toolchain.
+name: release
+on:
+  push:
+    tags: ["v*.*.*"]
+permissions:
+  contents: write
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Tag on main
+        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+      - name: Build
+        run: ./release.sh "$RUNNER_TEMP/dist"
+      - name: Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP"/dist/{launcher-linux-amd64,launcher-linux-arm64,checksums.txt} \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --title "$GITHUB_REF_NAME" \
+            --notes "Static linux launcher binaries built from $GITHUB_SHA by release.sh; sha256 in checksums.txt."

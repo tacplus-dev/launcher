@@ -9,4 +9,4 @@ the looper then marks it `promoted` or `declined` here with the date.
 - **Release assets from the deterministic build** (2026-11-07, tacplus-dev/launcher#5, tacplus-dev/looper#17): the release workflow (#5) builds the assets on a GitHub runner with `-trimpath` and the go.mod toolchain; once looper#17's pipeline exists, build (or reproduce and compare) them there and attach its attestation.
 
 ## Promoted / declined
-- **Release pipeline for the launcher** (2026-11-02, tacplus-dev/launcher#4): promoted 2026-11-06 (#5, approved by Jody); `release.sh` landed; the tag workflow waits on tacplus-dev/looper#106.
+- **Release pipeline for the launcher** (2026-11-02, tacplus-dev/launcher#4): promoted 2026-11-06 (#5, approved by Jody); `release.sh` and the tag workflow `.github/workflows/release.yml` landed (#5).
