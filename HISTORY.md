@@ -9,3 +9,4 @@ Append-only: add entries at the end, never edit or remove one (CI enforces it). 
 - 2026-11-15 looper issue Build security floor: three HIGH gosec findings in main.go (G402, G702, G703) need a fix or an exception (#7)
 - 2026-11-15 looper release v0.1.0 (https://github.com/tacplus-dev/launcher/releases/tag/v0.1.0)
 - 2026-11-15 looper issue Pin the build: a committed build.lock naming this repository's build image by digest (#6)
+- 2026-11-15 looper issue Release: v0.1.0 with static launcher-linux-{amd64,arm64} and checksums.txt, so kernel, eventbus and stratum can pin it (#5)
