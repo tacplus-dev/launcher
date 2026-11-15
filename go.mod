@@ -2,7 +2,7 @@ module github.com/tacplus-dev/launcher
 
 go 1.27.0
 
-toolchain go1.27.3
+toolchain go1.27.4
 
 require google.golang.org/grpc v1.84.0
 
