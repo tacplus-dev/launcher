@@ -1,0 +1,11 @@
+# Accepted security findings (looper README, Accepted exceptions): a finding
+# listed here is reported as excepted, not failed, until it expires.
+exceptions:
+  - id: G702
+    reason: "the launcher's purpose: it execs LAUNCH_CMD, set by the image's own environment at build time, never by a caller (launcher#7)"
+    decided_by: "hub (Jody's delegation, 2026-11-09)"
+    expires: 2027-02-09
+  - id: G703
+    reason: "findBinary resolves LAUNCH_CMD's binary through the image's own PATH, and the health probe reads the HEALTH_CA file, both set by the image's own environment at build time, never by a caller (launcher#7)"
+    decided_by: "hub (Jody's delegation, 2026-11-09)"
+    expires: 2027-02-09
