@@ -1,7 +1,7 @@
-# The build image of tacplus-dev/launcher, by digest (#6; looper#71): tacplus build 2.6 at v2.6.12's digest, the
-# fleet's build image (it carries the launcher at /usr/local/bin/launcher), whose Go is go.mod's toolchain
-# (go1.27.4: 2.6.12, since 2.6.8, for GO-2026-6859, #8) and in which this repository's gates (gates.yaml:
-# gates.sh) run with no Docker. This repository has no CI image of its own and is no tacplus project, so it has no
-# tacplus.lock; the build pipeline reads this pin the way it reads one. A new digest is a change like any other:
-# it lands on the full gates.
+# The build image of tacplus-dev/launcher, by digest (#6; looper#71): tacplus build 2.6 at a patch's digest (the
+# nightly relock moves it to the line's newest, #10), the fleet's build image (it carries the launcher at
+# /usr/local/bin/launcher), whose Go is go.mod's toolchain (go1.27.4: 2.6 since 2.6.8, for GO-2026-6859, #8) and
+# in which this repository's gates (gates.yaml: gates.sh) run with no Docker. This repository has no CI image of its
+# own and is no tacplus project, so it has no tacplus.lock; the build pipeline reads this pin the way it reads one.
+# A new digest is a change like any other: it lands on the full gates.
 build_image: ghcr.io/tacplus-dev/tacplus/build:2.6.13@sha256:0387c7dc05216bb2158d2b907f10840b67079026872d01c54362a90ecca9ba4a
