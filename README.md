@@ -50,6 +50,6 @@ probe accepted any certificate there.
 `govulncheck` of the source, the release assets built and checked
 (`tests/release.test.sh`: static, stripped, `-trimpath`, `checksums.txt` verifies,
 `govulncheck` of both binaries), and a checkout the build leaves clean.
-They run, with no Docker, in the image `build.lock` pins by digest (tacplus build 2.6.12, the fleet's build
-image), from which tacplus-dev/build plans every build of a commit (looper#71); to move it, change its digest:
+They run, with no Docker, in the image `build.lock` pins by digest (tacplus build 2.6 at a patch, the fleet's build
+image, moved to the line's newest by the nightly relock), from which tacplus-dev/build plans every build of a commit (looper#71); to move it, change its digest:
 a new digest is a change like any other, landed on the full gates.
