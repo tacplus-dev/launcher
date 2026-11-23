@@ -12,3 +12,4 @@ Append-only: add entries at the end, never edit or remove one (CI enforces it). 
 - 2026-11-15 looper issue Release: v0.1.0 with static launcher-linux-{amd64,arm64} and checksums.txt, so kernel, eventbus and stratum can pin it (#5)
 - 2026-11-15 looper issue STATE.md: Blocked on names tacplus-dev/looper#106, closed 2026-11-08; #5 now waits on tacplus-dev/looper#113 (#9)
 - 2026-11-22 looper issue Pinned images behind their lines: relock (build.lock: ghcr.io/tacplus-dev/tacplus/build:2.6.12 → ghcr.io/tacplus-dev/tacplus/build:2.6.13) (#10)
+- 2026-11-23 looper issue Pinned images behind their lines: relock (build.lock: ghcr.io/tacplus-dev/tacplus/build:2.6.13 → ghcr.io/tacplus-dev/tacplus/build:2.6.14) (#11)
